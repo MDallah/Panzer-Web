@@ -4,16 +4,16 @@
 #include <analogWrite.h>
 #include <Servo.h>
 
-#define a1 26
-#define a2 25
-#define aSpeed 27
-#define b1 33
-#define b2 32
-#define bSpeed 5
+#define R1 25
+#define R2 26
+#define RSpeed 27
+#define L1 33
+#define L2 32
+#define LSpeed 5
 #define Leds 17
 #define Fire 16
-#define servoRLpin 12
-#define servoUDpin 13
+#define servoRLpin 4
+#define servoUDpin 0
 
 char auth[] = "qbOwS1e6ZyWH49HYNchxHtK1CkfiiXJD";
 char ssid[] = "DRAGON";
@@ -40,35 +40,19 @@ BLYNK_WRITE(V1)
 
 BLYNK_WRITE(V2)
 {
-  posUD--;
-  if (posUD < 35) {
-    posUD = 35;
-  }
-  servoUD.write(posUD);
+  ServoDown();
 }
 BLYNK_WRITE(V8)
 {
-  posUD++;
-  if (posUD > 80) {
-    posUD = 80;
-  }
-  servoUD.write(posUD);
+  ServoUp();
 }
 BLYNK_WRITE(V4)
 {
-  posRL++;
-  if (posRL > 120) {
-    posRL = 120;
-  }
-  servoRL.write(posRL);
+  ServoLeft();
 }
 BLYNK_WRITE(V6)
 {
-  posRL--;
-  if (posRL < 0) {
-    posRL = 0;
-  }
-  servoRL.write(posRL);
+  ServoRight();
 }
 
 void moveControl(int x, int y)
@@ -84,21 +68,21 @@ void moveControl(int x, int y)
   else if (x >= maxRange && y >= maxRange)
   {
     Serial.print("right");
-    right();
+    forwardRight();
   }
 
   //Move Forward Left
   else if (x <= minRange && y >= maxRange)
   {
     Serial.print("left");
-    left();
+    forwardLeft();
   }
 
   //No Move
   else if (y < maxRange && y > minRange && x < maxRange && x > minRange)
   {
     Serial.print("stop");
-    stop();
+    Stop();
   }
 
   //Move Backward
@@ -112,25 +96,25 @@ void moveControl(int x, int y)
   else if (y <= minRange && x <= minRange)
   {
     Serial.print("right");
-    right();
+    backwardRight();
   }
 
   //Move Backward Left
   else if (y <= minRange && x >= maxRange)
   {
     Serial.print("left");
-    left();
+    backwardLeft();
   }
 }
 
 void setup()
 {
-  pinMode(a1, OUTPUT);
-  pinMode(a2, OUTPUT);
-  pinMode(aSpeed, OUTPUT);
-  pinMode(b1, OUTPUT);
-  pinMode(b2, OUTPUT);
-  pinMode(bSpeed, OUTPUT);
+  pinMode(R1, OUTPUT);
+  pinMode(R2, OUTPUT);
+  pinMode(RSpeed, OUTPUT);
+  pinMode(L1, OUTPUT);
+  pinMode(L2, OUTPUT);
+  pinMode(LSpeed, OUTPUT);
 
   servoRL.attach(servoRLpin);
   servoUD.attach(servoUDpin);
@@ -154,106 +138,126 @@ void loop()
 
 void forward()
 {
-  digitalWrite(a1, HIGH);
-  digitalWrite(b1, HIGH);
-  digitalWrite(a2, LOW);
-  digitalWrite(b2, LOW);
-  analogWrite(aSpeed, maxSpeed);
-  analogWrite(bSpeed, maxSpeed);
+  digitalWrite(R1, HIGH);
+  digitalWrite(L1, HIGH);
+  digitalWrite(R2, LOW);
+  digitalWrite(L2, LOW);
+  analogWrite(RSpeed, maxSpeed);
+  analogWrite(LSpeed, maxSpeed);
 }
 
 void backward()
 {
-  digitalWrite(a1, LOW);
-  digitalWrite(b1, LOW);
-  digitalWrite(a2, HIGH);
-  digitalWrite(b2, HIGH);
-  analogWrite(aSpeed, maxSpeed);
-  analogWrite(bSpeed, maxSpeed);
+  digitalWrite(R1, LOW);
+  digitalWrite(L1, LOW);
+  digitalWrite(R2, HIGH);
+  digitalWrite(L2, HIGH);
+  analogWrite(RSpeed, maxSpeed);
+  analogWrite(LSpeed, maxSpeed);
 }
 
 void left()
 {
-  digitalWrite(a1, HIGH);
-  digitalWrite(b1, LOW);
-  digitalWrite(a2, LOW);
-  digitalWrite(b2, HIGH);
-  analogWrite(aSpeed, maxSpeed);
-  analogWrite(bSpeed, maxSpeed);
+  digitalWrite(R1, HIGH);
+  digitalWrite(L1, LOW);
+  digitalWrite(R2, LOW);
+  digitalWrite(L2, HIGH);
+  analogWrite(RSpeed, minSpeed);
+  analogWrite(LSpeed, minSpeed);
 }
 
 void right()
 {
-  digitalWrite(a1, LOW);
-  digitalWrite(b1, HIGH);
-  digitalWrite(a2, HIGH);
-  digitalWrite(b2, LOW);
-  analogWrite(aSpeed, maxSpeed);
-  analogWrite(bSpeed, maxSpeed);
+  digitalWrite(R1, LOW);
+  digitalWrite(L1, HIGH);
+  digitalWrite(R2, HIGH);
+  digitalWrite(L2, LOW);
+  analogWrite(RSpeed, minSpeed);
+  analogWrite(LSpeed, minSpeed);
 }
 
-void stop()
+void Stop()
 {
-  digitalWrite(a1, LOW);
-  digitalWrite(b1, LOW);
-  digitalWrite(a2, LOW);
-  digitalWrite(b2, LOW);
-  analogWrite(aSpeed, noSpeed);
-  analogWrite(bSpeed, noSpeed);
+  digitalWrite(R1, LOW);
+  digitalWrite(L1, LOW);
+  digitalWrite(R2, LOW);
+  digitalWrite(L2, LOW);
+  analogWrite(RSpeed, noSpeed);
+  analogWrite(LSpeed, noSpeed);
 }
 
 void forwardLeft()
 {
-  digitalWrite(a1, LOW);
-  digitalWrite(b1, HIGH);
-  digitalWrite(a2, LOW);
-  digitalWrite(b2, LOW);
-  analogWrite(aSpeed, maxSpeed);
-  analogWrite(bSpeed, maxSpeed);
+  digitalWrite(R1, HIGH);
+  digitalWrite(L1, HIGH);
+  digitalWrite(R2, LOW);
+  digitalWrite(L2, LOW);
+  analogWrite(RSpeed, maxSpeed);
+  analogWrite(LSpeed, noSpeed);
 }
 
 void forwardRight()
 {
-  digitalWrite(a1, HIGH);
-  digitalWrite(b1, LOW);
-  digitalWrite(a2, LOW);
-  digitalWrite(b2, LOW);
-  analogWrite(aSpeed, maxSpeed);
-  analogWrite(bSpeed, maxSpeed);
+  digitalWrite(R1, HIGH);
+  digitalWrite(L1, HIGH);
+  digitalWrite(R2, LOW);
+  digitalWrite(L2, LOW);
+  analogWrite(RSpeed, noSpeed);
+  analogWrite(LSpeed, maxSpeed);
 }
 
 void backwardLeft()
 {
-  digitalWrite(a1, LOW);
-  digitalWrite(b1, LOW);
-  digitalWrite(a2, HIGH);
-  digitalWrite(b2, LOW);
-  analogWrite(aSpeed, maxSpeed);
-  analogWrite(bSpeed, maxSpeed);
+  digitalWrite(R1, LOW);
+  digitalWrite(L1, LOW);
+  digitalWrite(R2, HIGH);
+  digitalWrite(L2, HIGH);
+  analogWrite(RSpeed, noSpeed);
+  analogWrite(LSpeed, maxSpeed);
 }
 
 void backwardRight()
 {
-  digitalWrite(a1, LOW);
-  digitalWrite(b1, LOW);
-  digitalWrite(a2, LOW);
-  digitalWrite(b2, HIGH);
-  analogWrite(aSpeed, maxSpeed);
-  analogWrite(bSpeed, maxSpeed);
+  digitalWrite(R1, LOW);
+  digitalWrite(L1, LOW);
+  digitalWrite(R2, HIGH);
+  digitalWrite(L2, HIGH);
+  analogWrite(RSpeed, maxSpeed);
+  analogWrite(LSpeed, noSpeed);
 }
 
-void rotateRight()
+void ServoDown()
 {
-  digitalWrite(a1, HIGH);
-  digitalWrite(b1, LOW);
-  digitalWrite(a2, LOW);
-  digitalWrite(b2, HIGH);
+  posUD--;
+  if (posUD < 30) {
+    posUD = 30;
+  }
+  servoUD.write(posUD);
 }
 
-void rotateLeft()
+void ServoUp()
 {
-  digitalWrite(a1, LOW);
-  digitalWrite(b1, HIGH);
-  digitalWrite(a2, HIGH);
-  digitalWrite(b2, LOW);
+  posUD++;
+  if (posUD > 80) {
+    posUD = 80;
+  }
+  servoUD.write(posUD);
+}
+
+void ServoLeft()
+{
+  posRL++;
+  if (posRL > 120) {
+    posRL = 120;
+  }
+  servoRL.write(posRL);
+}
+
+void ServoRight()
+{
+  posRL--;
+  if (posRL < 0) {
+    posRL = 0;
+  }
+  servoRL.write(posRL);
 }
