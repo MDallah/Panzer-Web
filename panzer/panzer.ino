@@ -31,6 +31,58 @@ int posUD = 60;
 Servo servoRL;
 Servo servoUD;
 
+BLYNK_WRITE(V0)
+{
+  int x = param[0].asInt();
+  int y = param[1].asInt();
+  servoMoveControl(x, y);
+}
+
+void servoMoveControl(int x, int y)
+{
+  //Move Forward
+  if (y >= maxRange && x >= minRange && x <= maxRange)
+  {
+    ServoUp();
+  }
+
+  //Move Forward Right
+  else if (x >= maxRange && y >= maxRange)
+  {
+    ServoRight();
+  }
+
+  //Move Forward Left
+  else if (x <= minRange && y >= maxRange)
+  {
+    ServoLeft();
+  }
+
+  //No Move
+  else if (y < maxRange && y > minRange && x < maxRange && x > minRange)
+  {
+    ServoStop();
+  }
+
+  //Move Backward
+  else if (y <= minRange && x >= minRange && x <= maxRange)
+  {
+    ServoDown;
+  }
+
+  //Move Backward Right
+  else if (y <= minRange && x <= minRange)
+  {
+    ServoDown;
+  }
+
+  //Move Backward Left
+  else if (y <= minRange && x >= maxRange)
+  {
+    ServoDown;
+  }
+}
+
 BLYNK_WRITE(V1)
 {
   int x = param[0].asInt();
@@ -259,5 +311,11 @@ void ServoRight()
   if (posRL < 0) {
     posRL = 0;
   }
+  servoRL.write(posRL);
+}
+
+void ServoStop()
+{
+  servoUD.write(posUD);
   servoRL.write(posRL);
 }
